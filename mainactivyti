@@ -1,0 +1,66 @@
+package com.youmusic.neonevolution
+
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.FirebaseFunctions
+import com.youmusic.neonevolution.databinding.ActivityMainBinding
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var functions: FirebaseFunctions
+    private var isProUser = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        // 1. Inflar Interfaz Neón
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        functions = FirebaseFunctions.getInstance()
+
+        // 2. Verificar suscripción al iniciar
+        checkSubscriptionStatus()
+
+        // 3. Configurar botón Ultra-Bass
+        binding.btnUltraBass.setOnClickListener {
+            if (isProUser) {
+                toggleUltraBassEffect()
+            } else {
+                showPaymentDialog()
+            }
+        }
+    }
+
+    private fun checkSubscriptionStatus() {
+        // Llamamos a la función de la nube que configuramos con el Cron-Job
+        functions.getHttpsCallable("validarAccesoPro")
+            .call()
+            .addOnSuccessListener { result ->
+                val data = result.data as Map<String, Any>
+                isProUser = data["esPro"] as Boolean
+                
+                if (isProUser) {
+                    binding.statusBadge.text = "MODO PRO ACTIVO"
+                    binding.statusBadge.setTextColor(getColor(R.color.neon_cyan))
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error de conexión con la nube", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun toggleUltraBassEffect() {
+        // Aquí va tu lógica del motor DSP para potenciar graves
+        Toast.makeText(this, "¡Ultra-Bass Activado! 🔊", Toast.LENGTH_SHORT).show()
+        // Cambiar color del botón a Magenta Neón
+    }
+
+    private fun showPaymentDialog() {
+        // Aquí lanzas la pasarela de Google Play Billing por $50 MXN
+        Toast.makeText(this, "Suscríbete por $50 MXN para activar esta función", Toast.LENGTH_LONG).show()
+    }
+}

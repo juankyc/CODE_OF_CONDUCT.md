@@ -69,3 +69,133 @@
         android:layout_marginTop="10dp" />
 
 </RelativeLayout>
+class ActivityOne : AppCompatActivity() {
+
+    private lateinit var player: ExoPlayer
+    private var visualizer: Visualizer? = null
+    private var bassBoost: BassBoost? = null
+    private var isUltraBassOn = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        checkPermissions()
+        setupPlayer()
+        
+        val btnBass = findViewById<Button>(R.id.btn_ultrabass)
+        btnBass.setOnClickListener { toggleUltraBass(btnBass) }
+
+        val searchInput = findViewById<EditText>(R.id.search_input)
+        searchInput.setOnEditorActionListener { _, _, _ ->
+            // Simulación de inflado de lista
+            actualizarListaDePrueba()
+            true
+        }
+    }
+
+    private fun setupPlayer() {
+        player = ExoPlayer.Builder(this).build()
+        findViewById<PlayerView>(R.id.player_view).player = player
+        
+        // Listener para activar efectos cuando empiece el audio
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) startRhythmEffects(player.audioSessionId)
+            }
+        })
+    }
+
+    private fun toggleUltraBass(btn: Button) {
+        isUltraBassOn = !isUltraBassOn
+        btn.isSelected = isUltraBassOn
+        
+        val sessionId = player.audioSessionId
+        if (isUltraBassOn) {
+            bassBoost = BassBoost(0, sessionId).apply {
+                setStrength(900.toShort())
+                enabled = true
+            }
+            btn.setTextColor(Color.parseColor("#FF00FF")) // Rosa
+            Toast.makeText(this, "MODO ULTRA-BASS ACTIVADO", Toast.LENGTH_SHORT).show()
+        } else {
+            bassBoost?.enabled = false
+            btn.setTextColor(Color.parseColor("#00FBFF")) // Cian
+        }
+    }
+
+    private fun startRhythmEffects(sessionId: Int) {
+        visualizer = Visualizer(sessionId).apply {
+            captureSize = Visualizer.getCaptureSizeRange()[1]
+            setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
+                override fun onWaveFormDataCapture(v: Visualizer?, wave: ByteArray?, rate: Int) {
+                    val intensity = wave?.let { it.map { b -> Math.abs(b - 128) }.average().toFloat() } ?: 0f
+                    applyNeonPulse(intensity)
+                }
+                override fun onFftDataCapture(v: Visualizer?, fft: ByteArray?, rate: Int) {}
+            }, Visualizer.getMaxCaptureRate() / 2, true, false)
+            enabled = true
+        }
+    }
+
+    private fun applyNeonPulse(intensity: Float) {
+        val factor = Math.min(1f, intensity / 40f)
+        val color = ColorUtils.blendARGB(Color.parseColor("#00FBFF"), Color.parseColor("#FF00FF"), factor)
+        
+        runOnUiThread {
+            val layout = findViewById<RelativeLayout>(R.id.main_layout)
+            val container = findViewById<CardView>(R.id.player_container)
+            
+            // Pulso visual
+            container.setCardBackgroundColor(color)
+            container.scaleX = 1f + (factor * 0.05f)
+            container.scaleY = 1f + (factor * 0.05f)
+            
+            // Brillo de fondo
+            val gd = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(color, 0xFF050505.toInt()))
+            gd.alpha = (factor * 50).toInt() 
+            layout.background = gd
+        }<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+        
+        <activity
+            android:name=".ActivityOne"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+    </application>
+</manifest>
+
+    }
+
+    private fun checkPermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 1)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        visualizer?.release()
+        player.release()
+    }
+}
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#000000" />
+    <stroke
+        android:width="2dp"
+        android:color="#00FBFF" />
+    <corners android:radius="15dp" />
+    <padding android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp" />
+</shape>

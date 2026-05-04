@@ -1,0 +1,33 @@
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+// Esta función se activa cada vez que un usuario intenta activar el Ultra-Bass
+exports.validarAccesoPro = functions.https.onCall(async (data, context) => {
+    // 1. Verificar que el usuario esté logueado
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Debes iniciar sesión.');
+    }
+
+    const uid = context.auth.uid;
+    const userDoc = await admin.firestore().collection('suscripciones').document(uid).get();
+
+    if (!userDoc.exists) {
+        return { esPro: false, mensaje: "No tienes una suscripción activa." };
+    }
+
+    const datos = userDoc.data();
+    const fechaVencimiento = datos.vencimiento.toDate();
+    const ahora = new Date();
+
+    // 2. Verificar si la suscripción de $50 MXN sigue vigente
+    if (ahora > fechaVencimiento) {
+        // Si ya expiró, actualizamos la base de datos automáticamente
+        await admin.firestore().collection('suscripciones').document(uid).update({
+            esPro: false
+        });
+        return { esPro: false, mensaje: "Tu suscripción ha vencido." };
+    }
+
+    return { esPro: true, mensaje: "Acceso concedido. ¡Disfruta el Ultra-Bass!" };
+});

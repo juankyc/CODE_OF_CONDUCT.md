@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050505"
+    android:padding="16dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/player_container"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        app:cardBackgroundColor="#000000"
+        app:cardCornerRadius="20dp"
+        android:background="@drawable/neon_border">
+
+        <ImageView
+            android:id="@+id/album_art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:alpha="0.6" />
+            
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/player_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:use_controller="true" />
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btn_ultrabass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/player_container"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="ULTRA-BASS"
+        android:background="@drawable/btn_ultrabass_neon"
+        android:textColor="#00FBFF" />
+
+    <LinearLayout
+        android:id="@+id/spectrum_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/btn_ultrabass"
+        android:gravity="bottom|center"
+        android:orientation="horizontal">
+        </LinearLayout>
+
+    <EditText
+        android:id="@+id/search_input"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/spectrum_layout"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/neon_border"
+        android:hint="Buscar en YouMusic..."
+        android:textColor="#FFFFFF"
+        android:paddingHorizontal="15dp"
+        android:textColorHint="#444444" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_results_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/search_input"
+        android:layout_marginTop="10dp" />
+
+</RelativeLayout>

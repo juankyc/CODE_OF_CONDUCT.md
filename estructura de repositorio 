@@ -1,0 +1,14 @@
+YouMusic-Neon-Evolution/
+├── .github/                   # Archivos internos de GitHub
+│   └── CODE_OF_CONDUCT.md     # Reglas de comportamiento
+├── app/                       # El código fuente de Android
+│   ├── src/
+│   ├── build.gradle.kts       # Configuración de SDK y Firestore
+│   ├── google-services.json   # Vínculo con Firebase
+│   └── proguard-rules.pro     # Tu script de seguridad
+├── docs/                      # Documentación extendida
+│   └── CONTRIBUTING.md        # Cómo otros pueden ayudarte
+├── .gitignore                 # Para NO subir tus llaves privadas
+├── PRIVACY.md                 # Tu aviso de privacidad (Cyberpunk)
+├── LICENSE                    # Licencia MIT (recomendada)
+└── README.md                  # El archivo principal que acabamos de crear

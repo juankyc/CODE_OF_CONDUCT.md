@@ -1,0 +1,10 @@
+GitHub es tu portafolio profesional. Aquí es donde los profes de la IRC verán tu
+código.
+Limpieza: Asegúrate de que tu .gitignore incluya el archivo .jks y el 
+google-services.json (por seguridad).
+Subida: Usa estos comandos en la terminal de Android Studio:
+git add .
+git commit -m "Versión estable 1.0 - Estilo Neon Evolution"
+git push origin main 
+3. Release: En la página de GitHub, ve a "Releases" y crea una nueva. Sube ahí el
+archivo APK de prueba para que otros puedan bajarlo gratis si quieres

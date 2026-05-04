@@ -1,0 +1,6 @@
+# Llaves de firma (¡Secretas!)
+*.jks
+*.keystore
+
+# Archivo de contraseñas si creaste uno
+signing.properties
